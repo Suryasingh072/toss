@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FortuneFlip 🪙 Indian 1 Rupee</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --nblue:#4fc3f7;--npurple:#b57bee;--ngold:#ffd45e;
+  --bg:#040914;--bg2:#0a1228;
+  --glass:rgba(255,255,255,.045);--gborder:rgba(255,255,255,.11);
+  --txt:#eef2ff;--muted:rgba(180,200,240,.5);
+  --coin-sz:220px;
+}
+html{font-size:16px}
+body{background:var(--bg);color:var(--txt);font-family:'Raleway',sans-serif;min-height:100vh;overflow-x:hidden;position:relative}
+#cvs{position:fixed;inset:0;pointer-events:none;z-index:0}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 20%,rgba(79,195,247,.07) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 60% at 80% 80%,rgba(181,123,238,.08) 0%,transparent 70%),
+    radial-gradient(ellipse 40% 40% at 50% 50%,rgba(255,212,94,.04) 0%,transparent 60%);
+  pointer-events:none;
+}
+.wrap{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2.5rem 1.2rem 2rem;gap:2rem}
+
+header{text-align:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ngold);margin:0 auto .9rem;box-shadow:0 0 14px 5px rgba(255,212,94,.65);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(2);opacity:.5}}
+h1{font-family:'Cinzel',serif;font-size:clamp(2rem,7vw,3.2rem);font-weight:900;letter-spacing:.18em;color:var(--txt);text-shadow:0 0 40px rgba(79,195,247,.35)}
+h1 em{font-style:normal;color:var(--ngold);text-shadow:0 0 30px rgba(255,212,94,.6)}
+.tagline{font-weight:300;font-size:.82rem;letter-spacing:.35em;text-transform:uppercase;color:var(--muted);margin-top:.45rem}
+
+.stats{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
+.sc{background:var(--glass);border:1px solid var(--gborder);border-radius:14px;padding:.65rem 1.3rem;display:flex;flex-direction:column;align-items:center;gap:.15rem;min-width:85px;backdrop-filter:blur(18px);transition:border-color .3s,box-shadow .3s}
+.sc:hover{border-color:rgba(79,195,247,.3);box-shadow:0 0 22px rgba(79,195,247,.1)}
+.sv{font-family:'Cinzel',serif;font-size:1.55rem;font-weight:700;color:var(--ngold);line-height:1}
+.sl{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+
+.stage{position:relative;width:var(--coin-sz);height:var(--coin-sz);display:flex;align-items:center;justify-content:center;margin:1rem auto;perspective:1000px}
+.shadow{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);width:160px;height:28px;border-radius:50%;background:radial-gradient(ellipse,rgba(180,150,80,.35) 0%,transparent 70%);filter:blur(6px);animation:sh 3s ease-in-out infinite}
+@keyframes sh{0%,100%{transform:translateX(-50%) scaleX(1);opacity:.8}50%{transform:translateX(-50%) scaleX(.8);opacity:.35}}
+
+.coin{width:var(--coin-sz);height:var(--coin-sz);position:relative;transform-style:preserve-3d;cursor:pointer;transition:filter .3s}
+.coin:hover:not(.going){filter:drop-shadow(0 0 22px rgba(200,170,80,.5)) drop-shadow(0 12px 30px rgba(0,0,0,.7))}
+
+.face{position:absolute;inset:0;border-radius:50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
+.face svg{width:100%;height:100%;display:block}
+.tl{transform:rotateY(180deg)}
+
+@keyframes to-heads{
+  0%  {transform:rotateY(0) translateY(0)}
+  25% {transform:rotateY(540deg) translateY(-80px)}
+  65% {transform:rotateY(1260deg) translateY(-80px)}
+  85% {transform:rotateY(1800deg) translateY(-14px)}
+  93% {transform:rotateY(1800deg) translateY(8px)}
+  100%{transform:rotateY(1800deg) translateY(0)}
+}
+@keyframes to-tails{
+  0%  {transform:rotateY(0) translateY(0)}
+  25% {transform:rotateY(540deg) translateY(-80px)}
+  65% {transform:rotateY(1260deg) translateY(-80px)}
+  85% {transform:rotateY(1980deg) translateY(-14px)}
+  93% {transform:rotateY(1980deg) translateY(8px)}
+  100%{transform:rotateY(1980deg) translateY(0)}
+}
+.coin.to-h{animation:to-heads 1.95s cubic-bezier(.2,.95,.4,1) forwards}
+.coin.to-t{animation:to-tails 1.95s cubic-bezier(.2,.95,.4,1) forwards}
+
+.result{height:3rem;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.3rem}
+.rtxt{font-family:'Cinzel',serif;font-size:1.4rem;font-weight:700;letter-spacing:.28em;opacity:0;transform:translateY(10px);transition:opacity .5s,transform .5s}
+.rtxt.show{opacity:1;transform:translateY(0)}
+.rtxt.h{color:#ffd45e;text-shadow:0 0 25px rgba(255,212,94,.8),0 0 50px rgba(255,212,94,.3)}
+.rtxt.t{color:var(--nblue);text-shadow:0 0 25px rgba(79,195,247,.8),0 0 50px rgba(79,195,247,.3)}
+.streak{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;padding:.2rem .7rem;border-radius:50px;font-weight:600;background:rgba(181,123,238,.15);border:1px solid rgba(181,123,238,.4);color:var(--npurple);opacity:0;transform:scale(.8);transition:opacity .4s .2s,transform .4s .2s}
+.streak.show{opacity:1;transform:scale(1)}
+
+.btn-wrap{position:relative;border-radius:60px}
+.btn-glow{position:absolute;inset:-2px;border-radius:60px;z-index:0;background:linear-gradient(135deg,var(--nblue),var(--npurple),var(--ngold),var(--nblue));background-size:300% 300%;animation:gs 3s linear infinite;opacity:.75;transition:opacity .3s,inset .3s}
+@keyframes gs{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.btn-wrap:hover .btn-glow{opacity:1;inset:-4px}
+.btn{position:relative;z-index:1;background:var(--bg2);border:1px solid rgba(255,255,255,.09);border-radius:60px;cursor:pointer;display:flex;align-items:center;gap:.65rem;padding:.9rem 2.6rem;font-family:'Cinzel',serif;font-size:1rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--txt);transition:background .2s,transform .12s;outline:none}
+.btn:hover{background:#0e1a38}
+.btn:active{transform:scale(.97)}
+.btn:disabled{pointer-events:none;opacity:.45;filter:grayscale(.6)}
+
+.hist{width:100%;max-width:460px;background:var(--glass);border:1px solid var(--gborder);border-radius:20px;padding:1.2rem 1.4rem;backdrop-filter:blur(20px)}
+.hhdr{font-family:'Cinzel',serif;font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:.9rem;padding-bottom:.5rem;border-bottom:1px solid var(--gborder);display:flex;align-items:center;justify-content:space-between}
+.hlist{display:flex;gap:.55rem;flex-wrap:wrap;align-items:center;min-height:42px}
+.hempty{color:var(--muted);font-size:.8rem;font-style:italic}
+.chip{display:flex;align-items:center;gap:.38rem;padding:.38rem .85rem;border-radius:50px;font-family:'Cinzel',serif;font-size:.75rem;font-weight:700;letter-spacing:.12em;flex-shrink:0;animation:popin .35s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes popin{from{transform:scale(.4) translateY(10px);opacity:0}to{transform:scale(1);opacity:1}}
+.chip.h{background:rgba(255,212,94,.12);border:1px solid rgba(255,212,94,.38);color:var(--ngold)}
+.chip.t{background:rgba(79,195,247,.1);border:1px solid rgba(79,195,247,.32);color:var(--nblue)}
+.cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.chip.h .cdot{background:var(--ngold);box-shadow:0 0 6px var(--ngold)}
+.chip.t .cdot{background:var(--nblue);box-shadow:0 0 6px var(--nblue)}
+@keyframes statpop{0%{transform:scale(1)}35%{transform:scale(1.35)}65%{transform:scale(.95)}85%{transform:scale(1.1)}100%{transform:scale(1)}}
+.pop{animation:statpop .4s ease forwards}
+footer{color:var(--muted);font-size:.75rem;letter-spacing:.12em;margin-top:auto;padding-top:.8rem}
+@media(max-width:420px){:root{--coin-sz:175px}.wrap{padding:1.8rem .9rem 1.5rem;gap:1.5rem}h1{font-size:1.9rem}.btn{padding:.8rem 2rem;font-size:.88rem}}
+</style>
+</head>
+<body>
+<canvas id="cvs"></canvas>
+<div class="wrap">
+  <header>
+    <div class="dot"></div>
+    <h1>FORTUNE<em>FLIP</em></h1>
+    <p class="tagline">Indian ₹1 Rupee Edition</p>
+  </header>
+
+  <div class="stats">
+    <div class="sc"><span class="sv" id="sFlip">0</span><span class="sl">Total Flips</span></div>
+    <div class="sc"><span class="sv" id="sHeads">0</span><span class="sl">Heads</span></div>
+    <div class="sc"><span class="sv" id="sTails">0</span><span class="sl">Tails</span></div>
+  </div>
+
+  <div class="stage">
+    <div class="shadow"></div>
+    <div class="coin" id="coin">
+
+      <!-- HEADS — Ashoka Lion (Obverse) -->
+      <div class="face hd">
+        <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="hg" cx="36%" cy="30%" r="70%">
+              <stop offset="0%"   stop-color="#fffce0"/>
+              <stop offset="8%"   stop-color="#f8e888"/>
+              <stop offset="28%"  stop-color="#d4a832"/>
+              <stop offset="58%"  stop-color="#a07818"/>
+              <stop offset="80%"  stop-color="#7a5a0a"/>
+              <stop offset="100%" stop-color="#3e2800"/>
+            </radialGradient>
+            <clipPath id="cc"><circle cx="110" cy="110" r="107"/></clipPath>
+          </defs>
+          <circle cx="110" cy="110" r="110" fill="#2e1c00"/>
+          <circle cx="110" cy="110" r="107" fill="url(#hg)"/>
+          <!-- milled edge -->
+          <g clip-path="url(#cc)">
+            <g stroke="#b8840a" stroke-width="3" opacity=".65">
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(0 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(6 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(12 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(18 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(24 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(30 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(36 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(42 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(48 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(54 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(60 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(66 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(72 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(78 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(84 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(90 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(96 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(102 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(108 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(114 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(120 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(126 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(132 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(138 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(144 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(150 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(156 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(162 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(168 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(174 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(180 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(186 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(192 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(198 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(204 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(210 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(216 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(222 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(228 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(234 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(240 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(246 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(252 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(258 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(264 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(270 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(276 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(282 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(288 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(294 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(300 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(306 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(312 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(318 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(324 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(330 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(336 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(342 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(348 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(354 110 110)"/>
+            </g>
+          </g>
+          <!-- inner border rings -->
+          <circle cx="110" cy="110" r="100" fill="none" stroke="#b88810" stroke-width="1.8" opacity=".6"/>
+          <circle cx="110" cy="110" r="96"  fill="none" stroke="#eecc44" stroke-width=".6" opacity=".35"/>
+
+          <!-- ASHOKA EMBLEM GROUP, centered at 110,110 -->
+          <g transform="translate(110,110)">
+
+            <!-- === BASE PLATFORM === -->
+            <rect x="-34" y="48" width="68" height="8" rx="2.5" fill="#7a5205" stroke="#c08818" stroke-width=".8"/>
+            <rect x="-30" y="44" width="60" height="6" rx="2"   fill="#9a6a0a" stroke="#d4a020" stroke-width=".6"/>
+
+            <!-- Abacus stripe decoration -->
+            <rect x="-28" y="44.5" width="8" height="4" rx="1" fill="#c08010" opacity=".5"/>
+            <rect x="-12" y="44.5" width="8" height="4" rx="1" fill="#c08010" opacity=".5"/>
+            <rect x="4"   y="44.5" width="8" height="4" rx="1" fill="#c08010" opacity=".5"/>
+            <rect x="20"  y="44.5" width="8" height="4" rx="1" fill="#c08010" opacity=".5"/>
+
+            <!-- Small wheel on base -->
+            <circle cx="0" cy="51" r="5.5" fill="none" stroke="#7a5205" stroke-width="1.4"/>
+            <circle cx="0" cy="51" r="1.8" fill="#9a6a0a"/>
+            <line x1="0" y1="45.5" x2="0" y2="56.5" stroke="#7a5205" stroke-width=".9"/>
+            <line x1="-5.5" y1="51" x2="5.5" y2="51" stroke="#7a5205" stroke-width=".9"/>
+            <line x1="-3.9" y1="47.1" x2="3.9" y2="54.9" stroke="#7a5205" stroke-width=".7"/>
+            <line x1="3.9" y1="47.1" x2="-3.9" y2="54.9" stroke="#7a5205" stroke-width=".7"/>
+
+            <!-- === PILLAR SHAFT === -->
+            <rect x="-5.5" y="18" width="11" height="28" rx="2" fill="#b88a18" stroke="#d4a828" stroke-width=".6"/>
+            <rect x="-3.5" y="18" width="4" height="28" rx="1" fill="#f0d060" opacity=".2"/>
+
+            <!-- Bell capital -->
+            <path d="M-16,18 Q-8,8 0,6 Q8,8 16,18 Z" fill="#c09020" stroke="#dcb830" stroke-width=".6"/>
+            <!-- petal details on bell -->
+            <path d="M-16,18 Q-8,14 0,12" fill="none" stroke="#e8cc40" stroke-width=".5" opacity=".5"/>
+            <path d="M16,18 Q8,14 0,12"   fill="none" stroke="#e8cc40" stroke-width=".5" opacity=".5"/>
+
+            <!-- === LEFT LION (front-facing) === -->
+            <g transform="translate(-22,-10)">
+              <!-- body -->
+              <ellipse cx="0" cy="12" rx="11" ry="7" fill="#c09028" stroke="#dcb838" stroke-width=".7"/>
+              <!-- mane -->
+              <circle cx="-6" cy="2" r="10" fill="#b07818" stroke="#d0a020" stroke-width=".8" opacity=".8"/>
+              <!-- head fill over mane -->
+              <circle cx="-6" cy="2" r="7.5" fill="#c89030"/>
+              <circle cx="-6" cy="2" r="7.5" fill="none" stroke="#e0b838" stroke-width=".6"/>
+              <!-- eyes -->
+              <circle cx="-8.5" cy=".5" r="1.4" fill="#5a3800"/>
+              <circle cx="-3.5" cy=".5" r="1.4" fill="#5a3800"/>
+              <circle cx="-8.2" cy=".2" r=".5" fill="#e8c040" opacity=".5"/>
+              <circle cx="-3.2" cy=".2" r=".5" fill="#e8c040" opacity=".5"/>
+              <!-- nose -->
+              <ellipse cx="-6" cy="3.5" rx="2" ry="1" fill="#9a6808"/>
+              <!-- mouth -->
+              <path d="M-9,5.5 Q-6,8 -3,5.5" fill="none" stroke="#8a5808" stroke-width=".9" stroke-linecap="round"/>
+              <!-- whiskers -->
+              <line x1="-13" y1="3" x2="-8.5" y2="3.5" stroke="#a07818" stroke-width=".5" opacity=".7"/>
+              <line x1="-13" y1="5" x2="-8.5" y2="4.5" stroke="#a07818" stroke-width=".5" opacity=".7"/>
+              <line x1="0.5"  y1="3" x2="-3.5" y2="3.5" stroke="#a07818" stroke-width=".5" opacity=".7"/>
+              <!-- front leg -->
+              <line x1="-3" y1="18" x2="-4" y2="26" stroke="#b08018" stroke-width="3.5" stroke-linecap="round"/>
+              <line x1="4"  y1="18" x2="5"  y2="26" stroke="#b08018" stroke-width="3.5" stroke-linecap="round"/>
+              <!-- paws -->
+              <ellipse cx="-4" cy="27" rx="3.5" ry="1.5" fill="#c09028" stroke="#d0a020" stroke-width=".5"/>
+              <ellipse cx="5"  cy="27" rx="3.5" ry="1.5" fill="#c09028" stroke="#d0a020" stroke-width=".5"/>
+              <!-- claw marks -->
+              <line x1="-6"  y1="27.5" x2="-6"  y2="29.5" stroke="#9a7010" stroke-width=".6"/>
+              <line x1="-4"  y1="28"   x2="-4"   y2="30"   stroke="#9a7010" stroke-width=".6"/>
+              <line x1="-2"  y1="27.5" x2="-2"   y2="29.5" stroke="#9a7010" stroke-width=".6"/>
+              <!-- tail -->
+              <path d="M10,14 Q18,6 14,-4" fill="none" stroke="#b08018" stroke-width="2.2" stroke-linecap="round"/>
+              <!-- tail tuft -->
+              <circle cx="13.5" cy="-5" r="3.5" fill="#c09028" stroke="#d0a020" stroke-width=".6"/>
+              <line x1="11" y1="-3" x2="10" y2="-8" stroke="#b08018" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="13.5" y1="-1.5" x2="13" y2="-8.5" stroke="#b08018" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="16" y1="-3" x2="17" y2="-8" stroke="#b08018" stroke-width="1.2" stroke-linecap="round"/>
+            </g>
+
+            <!-- === RIGHT LION (mirrored) === -->
+            <g transform="translate(22,-10) scale(-1,1)">
+              <ellipse cx="0" cy="12" rx="11" ry="7" fill="#c09028" stroke="#dcb838" stroke-width=".7"/>
+              <circle cx="-6" cy="2" r="10" fill="#b07818" stroke="#d0a020" stroke-width=".8" opacity=".8"/>
+              <circle cx="-6" cy="2" r="7.5" fill="#c89030"/>
+              <circle cx="-6" cy="2" r="7.5" fill="none" stroke="#e0b838" stroke-width=".6"/>
+              <circle cx="-8.5" cy=".5" r="1.4" fill="#5a3800"/>
+              <circle cx="-3.5" cy=".5" r="1.4" fill="#5a3800"/>
+              <circle cx="-8.2" cy=".2" r=".5" fill="#e8c040" opacity=".5"/>
+              <circle cx="-3.2" cy=".2" r=".5" fill="#e8c040" opacity=".5"/>
+              <ellipse cx="-6" cy="3.5" rx="2" ry="1" fill="#9a6808"/>
+              <path d="M-9,5.5 Q-6,8 -3,5.5" fill="none" stroke="#8a5808" stroke-width=".9" stroke-linecap="round"/>
+              <line x1="-13" y1="3" x2="-8.5" y2="3.5" stroke="#a07818" stroke-width=".5" opacity=".7"/>
+              <line x1="-13" y1="5" x2="-8.5" y2="4.5" stroke="#a07818" stroke-width=".5" opacity=".7"/>
+              <line x1="0.5" y1="3" x2="-3.5" y2="3.5" stroke="#a07818" stroke-width=".5" opacity=".7"/>
+              <line x1="-3" y1="18" x2="-4" y2="26" stroke="#b08018" stroke-width="3.5" stroke-linecap="round"/>
+              <line x1="4"  y1="18" x2="5"  y2="26" stroke="#b08018" stroke-width="3.5" stroke-linecap="round"/>
+              <ellipse cx="-4" cy="27" rx="3.5" ry="1.5" fill="#c09028" stroke="#d0a020" stroke-width=".5"/>
+              <ellipse cx="5"  cy="27" rx="3.5" ry="1.5" fill="#c09028" stroke="#d0a020" stroke-width=".5"/>
+              <line x1="-6" y1="27.5" x2="-6" y2="29.5" stroke="#9a7010" stroke-width=".6"/>
+              <line x1="-4" y1="28"   x2="-4" y2="30"   stroke="#9a7010" stroke-width=".6"/>
+              <line x1="-2" y1="27.5" x2="-2" y2="29.5" stroke="#9a7010" stroke-width=".6"/>
+              <path d="M10,14 Q18,6 14,-4" fill="none" stroke="#b08018" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="13.5" cy="-5" r="3.5" fill="#c09028" stroke="#d0a020" stroke-width=".6"/>
+              <line x1="11" y1="-3" x2="10" y2="-8" stroke="#b08018" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="13.5" y1="-1.5" x2="13" y2="-8.5" stroke="#b08018" stroke-width="1.2" stroke-linecap="round"/>
+              <line x1="16" y1="-3" x2="17" y2="-8" stroke="#b08018" stroke-width="1.2" stroke-linecap="round"/>
+            </g>
+
+            <!-- === DHARMA CHAKRA (above lions) === -->
+            <circle cx="0" cy="-34" r="12" fill="none" stroke="#c09028" stroke-width="2.2"/>
+            <circle cx="0" cy="-34" r="3"  fill="#c09028"/>
+            <g stroke="#c09028" stroke-width=".9">
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(0   0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(15  0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(30  0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(45  0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(60  0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(75  0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(90  0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(105 0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(120 0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(135 0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(150 0 -34)"/>
+              <line x1="0" y1="-46" x2="0" y2="-22" transform="rotate(165 0 -34)"/>
+            </g>
+
+          </g>
+
+          <!-- "भारत" top arc -->
+          <path id="ta" d="M 36,110 A 74,74 0 0,1 184,110" fill="none"/>
+          <text font-family="serif" font-size="13.5" font-weight="bold" fill="#5c3a00" letter-spacing="2.5">
+            <textPath href="#ta" startOffset="14%">भारत  ✦  INDIA</textPath>
+          </text>
+
+          <!-- "सत्यमेव जयते" bottom arc -->
+          <path id="ba" d="M 44,122 A 70,70 0 0,0 176,122" fill="none"/>
+          <text font-family="serif" font-size="11" font-weight="bold" fill="#5c3a00" letter-spacing="1.5">
+            <textPath href="#ba" startOffset="18%">सत्यमेव जयते</textPath>
+          </text>
+
+          <!-- sheen -->
+          <ellipse cx="78" cy="65" rx="30" ry="16" fill="white" opacity=".065" transform="rotate(-28 78 65)"/>
+
+          <circle cx="110" cy="110" r="107" fill="none" stroke="#9a7010" stroke-width="2.5"/>
+          <circle cx="110" cy="110" r="103" fill="none" stroke="#f0cc40" stroke-width=".7" opacity=".4"/>
+        </svg>
+      </div>
+
+      <!-- TAILS — ₹1 Reverse -->
+      <div class="face tl">
+        <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="tg" cx="36%" cy="30%" r="70%">
+              <stop offset="0%"   stop-color="#fffce0"/>
+              <stop offset="8%"   stop-color="#f8e888"/>
+              <stop offset="28%"  stop-color="#d4a832"/>
+              <stop offset="58%"  stop-color="#a07818"/>
+              <stop offset="80%"  stop-color="#7a5a0a"/>
+              <stop offset="100%" stop-color="#3e2800"/>
+            </radialGradient>
+            <clipPath id="cc2"><circle cx="110" cy="110" r="107"/></clipPath>
+          </defs>
+          <circle cx="110" cy="110" r="110" fill="#2e1c00"/>
+          <circle cx="110" cy="110" r="107" fill="url(#tg)"/>
+          <!-- milled edge -->
+          <g clip-path="url(#cc2)">
+            <g stroke="#b8840a" stroke-width="3" opacity=".65">
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(0 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(6 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(12 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(18 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(24 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(30 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(36 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(42 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(48 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(54 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(60 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(66 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(72 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(78 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(84 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(90 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(96 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(102 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(108 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(114 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(120 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(126 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(132 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(138 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(144 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(150 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(156 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(162 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(168 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(174 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(180 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(186 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(192 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(198 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(204 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(210 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(216 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(222 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(228 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(234 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(240 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(246 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(252 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(258 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(264 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(270 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(276 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(282 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(288 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(294 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(300 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(306 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(312 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(318 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(324 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(330 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(336 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(342 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(348 110 110)"/>
+              <line x1="110" y1="2" x2="110" y2="13" transform="rotate(354 110 110)"/>
+            </g>
+          </g>
+          <circle cx="110" cy="110" r="100" fill="none" stroke="#b88810" stroke-width="1.8" opacity=".6"/>
+          <circle cx="110" cy="110" r="96"  fill="none" stroke="#eecc44" stroke-width=".6" opacity=".35"/>
+
+          <!-- BIG ₹ symbol -->
+          <text x="110" y="128" text-anchor="middle"
+                font-family="Arial,Helvetica,sans-serif" font-size="82" font-weight="900"
+                fill="#7a5205" stroke="#c89020" stroke-width="1.8" paint-order="stroke">₹</text>
+
+          <!-- "1" numeral small above symbol -->
+          <text x="110" y="54" text-anchor="middle"
+                font-family="'Cinzel',serif" font-size="16" font-weight="900"
+                fill="#6a4400" stroke="#c08010" stroke-width=".6" paint-order="stroke" letter-spacing="3">1</text>
+
+          <!-- ONE RUPEE text bottom -->
+          <text x="110" y="178" text-anchor="middle"
+                font-family="'Cinzel',serif" font-size="14" font-weight="900"
+                fill="#6a4400" stroke="#c08010" stroke-width=".5" paint-order="stroke" letter-spacing="2">ONE RUPEE</text>
+
+          <!-- Year -->
+          <text x="110" y="196" text-anchor="middle"
+                font-family="serif" font-size="11" font-weight="bold"
+                fill="#7a5a0a" letter-spacing="3" opacity=".8">2024</text>
+
+          <!-- Wheat stalk LEFT -->
+          <g stroke="#9a7010" stroke-width="1.4" stroke-linecap="round" fill="none" opacity=".75">
+            <line x1="36" y1="160" x2="36" y2="72"/>
+            <line x1="36" y1="82"  x2="26" y2="72"/>
+            <line x1="36" y1="90"  x2="25" y2="81"/>
+            <line x1="36" y1="98"  x2="26" y2="89"/>
+            <line x1="36" y1="106" x2="25" y2="97"/>
+            <line x1="36" y1="114" x2="26" y2="105"/>
+            <line x1="36" y1="122" x2="25" y2="113"/>
+            <line x1="36" y1="130" x2="26" y2="121"/>
+            <line x1="36" y1="138" x2="25" y2="129"/>
+            <line x1="36" y1="146" x2="26" y2="137"/>
+            <!-- grain head -->
+            <ellipse cx="31" cy="66" rx="6" ry="9" fill="#c09020" stroke="#d4a828" stroke-width=".8" transform="rotate(-18 31 66)"/>
+            <line x1="31" y1="57" x2="27" y2="52" stroke="#a07818" stroke-width=".8"/>
+            <line x1="31" y1="57" x2="35" y2="51" stroke="#a07818" stroke-width=".8"/>
+          </g>
+
+          <!-- Wheat stalk RIGHT -->
+          <g stroke="#9a7010" stroke-width="1.4" stroke-linecap="round" fill="none" opacity=".75">
+            <line x1="184" y1="160" x2="184" y2="72"/>
+            <line x1="184" y1="82"  x2="194" y2="72"/>
+            <line x1="184" y1="90"  x2="195" y2="81"/>
+            <line x1="184" y1="98"  x2="194" y2="89"/>
+            <line x1="184" y1="106" x2="195" y2="97"/>
+            <line x1="184" y1="114" x2="194" y2="105"/>
+            <line x1="184" y1="122" x2="195" y2="113"/>
+            <line x1="184" y1="130" x2="194" y2="121"/>
+            <line x1="184" y1="138" x2="195" y2="129"/>
+            <line x1="184" y1="146" x2="194" y2="137"/>
+            <ellipse cx="189" cy="66" rx="6" ry="9" fill="#c09020" stroke="#d4a828" stroke-width=".8" transform="rotate(18 189 66)"/>
+            <line x1="189" y1="57" x2="185" y2="52" stroke="#a07818" stroke-width=".8"/>
+            <line x1="189" y1="57" x2="193" y2="51" stroke="#a07818" stroke-width=".8"/>
+          </g>
+
+          <!-- Diamond dividers between ₹ and text -->
+          <polygon points="70,164 74,168 70,172 66,168" fill="#b08820" opacity=".7"/>
+          <polygon points="150,164 154,168 150,172 146,168" fill="#b08820" opacity=".7"/>
+
+          <!-- sheen -->
+          <ellipse cx="78" cy="65" rx="28" ry="15" fill="white" opacity=".065" transform="rotate(-28 78 65)"/>
+
+          <circle cx="110" cy="110" r="107" fill="none" stroke="#9a7010" stroke-width="2.5"/>
+          <circle cx="110" cy="110" r="103" fill="none" stroke="#f0cc40" stroke-width=".7" opacity=".4"/>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="result">
+    <div class="rtxt" id="rtxt"></div>
+    <div class="streak" id="streak"></div>
+  </div>
+
+  <div class="btn-wrap">
+    <div class="btn-glow"></div>
+    <button class="btn" id="btn" onclick="go()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 4v6h-6M1 20v-6h6"/>
+        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+      </svg>
+      Flip Coin
+    </button>
+  </div>
+
+  <div class="hist">
+    <div class="hhdr">
+      <span>Recent Flips</span>
+      <span id="hcount" style="color:var(--muted);font-size:.68rem"></span>
+    </div>
+    <div class="hlist" id="hlist">
+      <span class="hempty">No flips yet — start flipping!</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="sc"><span class="sv" id="sFlip">0</span><span class="sl">Total Flips</span></div>
+    <div class="sc"><span class="sv" id="sHeads">0</span><span class="sl">Heads</span></div>
+    <div class="sc"><span class="sv" id="sTails">0</span><span class="sl">Tails</span></div>
+  </div>
+
+  <footer>Made with ✦ and JavaScript &nbsp;•&nbsp; Indian ₹1 Rupee Edition</footer>
+</div>
+
+<script>
+const S={flips:0,heads:0,tails:0,hist:[],busy:false};
+const coin=document.getElementById('coin'),btn=document.getElementById('btn');
+const rtxt=document.getElementById('rtxt'),streak=document.getElementById('streak');
+const hlist=document.getElementById('hlist'),hcount=document.getElementById('hcount');
+
+let AC=null;
+function audio(){if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)()}
+function whoosh(){
+  try{audio();
+    const o=AC.createOscillator(),g=AC.createGain();
+    o.connect(g);g.connect(AC.destination);
+    o.type='sawtooth';
+    o.frequency.setValueAtTime(650,AC.currentTime);
+    o.frequency.exponentialRampToValueAtTime(55,AC.currentTime+.65);
+    g.gain.setValueAtTime(.16,AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+.65);
+    o.start();o.stop(AC.currentTime+.65);
+  }catch(e){}
+}
+function clink(h){
+  try{audio();
+    [h?1400:900,h?1800:1100,h?1000:700].forEach((f,i)=>{
+      const o=AC.createOscillator(),g=AC.createGain();
+      o.connect(g);g.connect(AC.destination);
+      o.type='triangle';o.frequency.value=f;
+      const t=AC.currentTime+i*.055;
+      g.gain.setValueAtTime(.13,t);
+      g.gain.exponentialRampToValueAtTime(.001,t+.3);
+      o.start(t);o.stop(t+.32);
+    });
+  }catch(e){}
+}
+
+function go(){
+  if(S.busy)return;
+  S.busy=true;btn.disabled=true;
+  if(navigator.vibrate)navigator.vibrate([40,20,40]);
+  rtxt.classList.remove('show','h','t');
+  streak.classList.remove('show');
+  coin.className='coin going';
+  void coin.offsetWidth;
+  const isH=Math.random()<.5;
+  whoosh();
+  coin.className='coin going '+(isH?'to-h':'to-t');
+  setTimeout(()=>{
+    S.flips++;if(isH)S.heads++;else S.tails++;
+    clink(isH);
+    if(navigator.vibrate)navigator.vibrate(90);
+    updateStats(isH);showResult(isH);addHist(isH);
+    S.busy=false;btn.disabled=false;
+  },1980);
+}
+coin.addEventListener('click',()=>{if(!S.busy)go()});
+
+function updateStats(isH){
+  document.getElementById('sFlip').textContent=S.flips;
+  document.getElementById('sHeads').textContent=S.heads;
+  document.getElementById('sTails').textContent=S.tails;
+  pop(document.getElementById('sFlip'));
+  pop(document.getElementById(isH?'sHeads':'sTails'));
+}
+function pop(el){el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');el.addEventListener('animationend',()=>el.classList.remove('pop'),{once:true})}
+
+function showResult(isH){
+  rtxt.textContent=isH?'✦ HEADS ✦':'✦ TAILS ✦';
+  rtxt.className='rtxt '+(isH?'h':'t');
+  void rtxt.offsetWidth;rtxt.classList.add('show');
+  checkStreak();
+}
+function checkStreak(){
+  if(S.hist.length<2){streak.classList.remove('show');return}
+  const last=S.hist[S.hist.length-1];
+  let n=1;for(let i=S.hist.length-2;i>=0;i--){if(S.hist[i]===last)n++;else break}
+  if(n>=3){streak.textContent=n+'x '+last+' streak! 🔥';streak.classList.add('show')}
+  else streak.classList.remove('show');
+}
+function addHist(isH){
+  S.hist.push(isH?'h':'t');
+  if(S.hist.length>5)S.hist.shift();
+  renderHist();
+}
+function renderHist(){
+  hlist.innerHTML='';
+  hcount.textContent=S.hist.length?S.hist.length+'/5':'';
+  if(!S.hist.length){hlist.innerHTML='<span class="hempty">No flips yet — start flipping!</span>';return}
+  [...S.hist].reverse().forEach((r,i)=>{
+    const c=document.createElement('div');
+    c.className='chip '+(r==='h'?'h':'t');
+    c.style.animationDelay=i*.04+'s';
+    const d=document.createElement('span');d.className='cdot';
+    const l=document.createElement('span');l.textContent=r==='h'?'Heads':'Tails';
+    c.appendChild(d);c.appendChild(l);hlist.appendChild(c);
+  });
+}
+
+const cv=document.getElementById('cvs'),cx=cv.getContext('2d');
+let pts=[];
+function resize(){cv.width=innerWidth;cv.height=innerHeight}
+class P{
+  constructor(init){
+    this.x=Math.random()*cv.width;
+    this.y=init?Math.random()*cv.height:cv.height+8;
+    this.vx=(Math.random()-.5)*.4;this.vy=-(Math.random()*.6+.15);
+    this.r=Math.random()*2+.4;this.life=0;this.max=Math.random()*220+80;
+    this.peak=Math.random()*.45+.08;
+    const n=Math.random();
+    this.c=n<.3?'#4fc3f7':n<.55?'#b57bee':n<.8?'#ffd45e':'#e8c040';
+  }
+  tick(){this.x+=this.vx;this.y+=this.vy;this.life++;this.a=this.peak*Math.sin(this.life/this.max*Math.PI);if(this.life>=this.max)Object.assign(this,new P(false))}
+  draw(){cx.save();cx.globalAlpha=this.a;cx.fillStyle=this.c;cx.shadowBlur=7;cx.shadowColor=this.c;cx.beginPath();cx.arc(this.x,this.y,this.r,0,6.28);cx.fill();cx.restore()}
+}
+function init(){resize();pts=[];const n=Math.min(Math.floor(innerWidth*.08),100);for(let i=0;i<n;i++)pts.push(new P(true))}
+(function loop(){cx.clearRect(0,0,cv.width,cv.height);pts.forEach(p=>{p.tick();p.draw()});requestAnimationFrame(loop)})();
+window.addEventListener('resize',init);
+init();renderHist();
+</script>
+</body>
+</html>
